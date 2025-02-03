@@ -157,6 +157,10 @@ class DashboardItemController<T extends DashboardItem> with ChangeNotifier {
   List<DashboardItem> get realItems =>
       List.unmodifiable(_items.values.map((e) => e as DashboardItem));
 
+  //! MOMENTO
+  Map<String, DashboardItem> get realItemsMap => Map.unmodifiable(
+      {for (var e in _items.values) e.identifier: e as DashboardItem});
+
   Duration? _timeout;
 
   FutureOr<void> _loadItems(int slotCount) {

@@ -24,7 +24,8 @@ typedef DashboardItemBuilder<T extends DashboardItem> = Widget Function(T item);
 /// This controller is also used to add/delete widget and handle layout changes.
 class Dashboard<T extends DashboardItem> extends StatefulWidget {
   /// A list of widget arranged with hand or initially.
-  Dashboard({super.key,
+  Dashboard({
+    super.key,
     required this.itemBuilder,
     required this.dashboardItemController,
     this.slotCount = 8,
@@ -49,10 +50,15 @@ class Dashboard<T extends DashboardItem> extends StatefulWidget {
     this.animateEverytime = true,
     this.itemStyle = const ItemStyle(),
     this.scrollToAdded = true,
-    this.slotBackgroundBuilder})
-      : assert((slotHeight == null && slotAspectRatio == null) ||
-      !(slotHeight != null && slotAspectRatio != null)),
+    this.slotBackgroundBuilder,
+    this.onChange,
+  })  : assert((slotHeight == null && slotAspectRatio == null) ||
+            !(slotHeight != null && slotAspectRatio != null)),
         editModeSettings = editModeSettings ?? EditModeSettings();
+
+  ///! MOMENTO
+  /// Callback that triggers when the layout changes (e.g., position or size updates).
+  final void Function(List<DashboardItem>)? onChange;
 
   /// If [slotBackgroundBuilder] is not null, the background of the slots
   /// is drawn with the  [SlotBackgroundBuilder.build] method.
@@ -213,6 +219,12 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
     _layoutController = _DashboardLayoutController<T>();
     _layoutController.addListener(() {
       setState(() {});
+
+      _layoutController.itemController;
+      // Trigger the onChange callback with updated items
+      if (widget.onChange != null) {
+        widget.onChange!(_layoutController.itemController.realItems);
+      }
     });
 
     widget.dashboardItemController._attach(_layoutController);
@@ -235,7 +247,7 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
 
   bool get hasDimensions {
     final RenderBox? renderBox =
-    myWidgetKey.currentContext?.findRenderObject() as RenderBox?;
+        myWidgetKey.currentContext?.findRenderObject() as RenderBox?;
     // Checks if the renderBox is not null and has a non-zero size
     return renderBox != null && renderBox.hasSize;
   }
@@ -361,10 +373,10 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
 
   ///
   final GlobalKey<_DashboardStackState<T>> _stateKey =
-  GlobalKey<_DashboardStackState<T>>();
+      GlobalKey<_DashboardStackState<T>>();
 
   final GlobalKey<ScrollableState> _scrollableKey =
-  GlobalKey<ScrollableState>();
+      GlobalKey<ScrollableState>();
 
   bool scrollable = true;
 
@@ -427,7 +439,7 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
         if (_snap!.connectionState == ConnectionState.none) {
           _building = false;
           return widget.errorPlaceholder
-              ?.call(_snap!.error!, _snap!.stackTrace!) ??
+                  ?.call(_snap!.error!, _snap!.stackTrace!) ??
               const SizedBox();
         } else if (_snap!.connectionState == ConnectionState.waiting ||
             _reloading) {
@@ -449,7 +461,7 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
   Widget dashboardWidget(BoxConstraints constrains) {
     return Scrollable(
         physics:
-        scrollable ? widget.physics : const NeverScrollableScrollPhysics(),
+            scrollable ? widget.physics : const NeverScrollableScrollPhysics(),
         key: _scrollableKey,
         controller: widget.scrollController,
         semanticChildCount: widget.dashboardItemController._items.length,
@@ -471,7 +483,6 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
               _setNewOffset(o, constrains);
             },
             onScrollStateChange: (st) {
-
               SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
                 _moving = !st;
 
@@ -500,9 +511,10 @@ class _DashboardState<T extends DashboardItem> extends State<Dashboard<T>>
 }
 
 class _ItemCurrentPositionTween extends Tween<_ItemCurrentPosition> {
-  _ItemCurrentPositionTween({required _ItemCurrentPosition begin,
-    required _ItemCurrentPosition end,
-    required this.onlyDimensions})
+  _ItemCurrentPositionTween(
+      {required _ItemCurrentPosition begin,
+      required _ItemCurrentPosition end,
+      required this.onlyDimensions})
       : super(begin: begin, end: end);
 
   bool onlyDimensions;

@@ -369,9 +369,7 @@ class _DashboardStackState<T extends DashboardItem>
         if (speed != 0) {
           var n = pixels + speed;
 
-
           viewportOffset.jumpTo(n.clamp(0.0, (1 << 31).toDouble()));
-
 
           scroll();
         }
@@ -510,10 +508,61 @@ class _DashboardStackState<T extends DashboardItem>
         });
       }
     } else {
-      var resizeMoveResult = _editing!._transformUpdate(
-          local - _moveStartOffset!, pixels - _startScrollPixels!, holdOffset);
+      // print("🏀move");
+
+      // Get viewport dimensions
+      // final constraints =
+      //     widget.dashboardController._viewportDelegate.constraints;
+      // final maxW = constraints.maxWidth;
+      // final maxH = constraints.maxHeight;
+      // print("maxW: $maxW; maxH: $maxH");
+
+      // Current positions
+      _ResizeMoveResult? resizeMoveResult = _editing!._transformUpdate(
+        local - _moveStartOffset!,
+        pixels - _startScrollPixels!,
+        holdOffset,
+      );
 
       if (resizeMoveResult != null && resizeMoveResult.isChanged) {
+        // // Calculate the new position based on startDifference
+        // var currentPosition = _editing!._currentPosition(
+        //   slotEdge: slotEdge,
+        //   viewportDelegate: widget.dashboardController._viewportDelegate,
+        //   verticalSlotEdge: verticalSlotEdge,
+        // );
+        // // print("currentPosition $currentPosition");
+        // var newX = currentPosition.x + resizeMoveResult.startDifference.dx;
+        // var newY = currentPosition.y + resizeMoveResult.startDifference.dy;
+        // // print("newX $newX; newY $newY");
+
+        // // Enforce viewport boundaries
+        // final constraints =
+        //     widget.dashboardController._viewportDelegate.constraints;
+        // final maxW = constraints.maxWidth;
+        // final maxH = constraints.maxHeight;
+        // var itemWidth = _editing!.width * slotEdge;
+        // var itemHeight = _editing!.height * verticalSlotEdge;
+
+        // if (!widget.editModeSettings.draggableOutside) {
+        //   if (newX < 0) {
+        //     newX = 0;
+        //   } else if (newX + itemWidth > maxW) {
+        //     newX = maxW - itemWidth;
+        //   }
+
+        //   if (!widget.editModeSettings.autoScroll) {
+        //     final scrollOffset = widget.offset.pixels;
+        //     if (newY < scrollOffset) {
+        //       newY = scrollOffset;
+        //     } else if (newY + itemHeight > maxH + scrollOffset) {
+        //       newY = maxH + scrollOffset - itemHeight;
+        //     }
+        //   }
+        // }
+        // print("[2] newX $newX; newY $newY");
+
+        // Update the widget state
         setState(() {
           _moveStartOffset =
               _moveStartOffset! + resizeMoveResult.startDifference;
@@ -524,6 +573,20 @@ class _DashboardStackState<T extends DashboardItem>
           }
         });
       }
+      // var resizeMoveResult = _editing!._transformUpdate(
+      //     local - _moveStartOffset!, pixels - _startScrollPixels!, holdOffset);
+
+      // if (resizeMoveResult != null && resizeMoveResult.isChanged) {
+      //   setState(() {
+      //     _moveStartOffset =
+      //         _moveStartOffset! + resizeMoveResult.startDifference;
+      //     _widgetsMap.remove(_editing!.id);
+
+      // if (_editing!._endIndex > (e)) {
+      //   widget.shouldCalculateNewDimensions();
+      // }
+      //   });
+      // }
     }
   }
 
