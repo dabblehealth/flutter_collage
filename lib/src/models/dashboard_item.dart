@@ -52,4 +52,31 @@ class DashboardItem {
   Map<String, dynamic> toMap() {
     return {"item_id": identifier, "layout": layoutData.toMap()};
   }
+
+  DashboardItem copyWith() {
+    return DashboardItem(
+      startX: layoutData.startX,
+      startY: layoutData.startY,
+      identifier: identifier,
+      width: layoutData.width,
+      height: layoutData.height,
+      minWidth: layoutData.minWidth,
+      minHeight: layoutData.minHeight,
+      maxWidth: layoutData.maxWidth,
+      maxHeight: layoutData.maxHeight,
+    );
+  }
+
+  bool areLayoutsSame(DashboardItem otherDashboardItem) {
+    ItemLayout currentLayoutData = layoutData;
+    ItemLayout otherLayoutData = otherDashboardItem.layoutData;
+    return currentLayoutData.width == otherLayoutData.width &&
+        currentLayoutData.height == otherLayoutData.height &&
+        currentLayoutData.minWidth == otherLayoutData.minWidth &&
+        currentLayoutData.minHeight == otherLayoutData.minHeight &&
+        currentLayoutData.maxWidth == otherLayoutData.maxWidth &&
+        currentLayoutData.maxHeight == otherLayoutData.maxHeight &&
+        currentLayoutData.startX == otherLayoutData.startX &&
+        currentLayoutData.startY == otherLayoutData.startY;
+  }
 }
